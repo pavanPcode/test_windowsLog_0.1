@@ -6,19 +6,21 @@ from datetime import datetime,timedelta
 #from windows_notification11 import windows_not
 # from plyer import notification
 import win32evtlog
+import win32evtlogutil
+import win32con
 
 # Get the current date and time
 date = datetime.now()
 
 
 
-def application_error(message):
+def event_viewer_log(event_id,event_strings,description):
     # Log the exception to the Windows Event Log
-    log_type = 'iParkANPR'  # You can change this to 'Security', 'System', etc.
-    event_id = 1005  # You can choose a unique event ID
+    log_type = 'iParkRight'  # You can change this to 'Security', 'System', etc.
+    # event_id = 1005  # You can choose a unique event ID
     event_category = 0  # The category of the event (0 for none)
-    description = "Please restart your device . New Data Not Comming."
-    event_strings = [f"Exception occurred: {message}",description]
+    # description = "Please restart your device . New Data Not Comming."
+    # event_strings = [f"Exception occurred: {message}",description]
 
     # # Additional information for the event
 
@@ -30,21 +32,11 @@ def application_error(message):
     # Print parameters for debugging
     #print(f"log_type: {log_type}, event_id: {event_id}, event_category: {event_category}, event_strings: {event_strings}")
 
-    # Report the event
-    win32evtlog.ReportEvent(
-        h_log,
-        win32evtlog.EVENTLOG_ERROR_TYPE,
-        event_category,
-        event_id,
-        None,
-        event_strings,
-        None,
-
-    )
-
-    # Close the event log
+    win32evtlog.ReportEvent(h_log,win32evtlog.EVENTLOG_ERROR_TYPE,event_category,event_id,None,event_strings,None,)
     win32evtlog.CloseEventLog(h_log)
-    return message
+
+
+    return True
 
 
 
@@ -127,9 +119,53 @@ def read_data_from_file():
 
     return data
 
-end_time = datetime.now() + timedelta(days=30)
+def requestpostdata(url):
 
+    form_data = {
+        "gm_transaction_id": "12345",
+        "cardId": "67890",
+        "dateOfTransaction": "2023-10-09",
+        "vehicleImage": "vehicle_image_data_here",
+        "numberPlateImage": "number_plate_image_data_here",
+        "vehicleImageb64": "base64_encoded_vehicle_image_data_here",
+        "numberPlateImageb64": "base64_encoded_number_plate_image_data_here"
+    }
+
+    # Send the POST request with the form data
+    response = requests.post(url, data=form_data)
+
+    # Check the response status
+    if response.status_code == 200:
+        print("Form data sent successfully")
+    else:
+        print("Error sending form data. Status code:", response.status_code)
+
+def starting_event():
+
+    # Define your event source and log name
+    event_source = "iParkRight"
+    event_log = "Application"
+
+    # Open the event log for writing
+    handle = win32evtlog.OpenEventLog(None, event_log)
+
+    # Define the event category, event ID, and event message
+    event_category = 0
+    event_id = 1001  # Unique event ID
+    event_message = f"ANPR Services Started Successfully - {datetime.now()} "
+
+    # Write an information event
+    win32evtlog.ReportEvent(handle, win32evtlog.EVENTLOG_INFORMATION_TYPE, event_category, event_id, None,
+                            (event_message,),None)
+
+    # Close the event log handle
+    win32evtlog.CloseEventLog(handle)
+starting_event()
+
+
+end_time = datetime.now() + timedelta(days=30)
 while datetime.now() < end_time:
+
     #print("Running your task at:", datetime.now())
 
     try:
@@ -139,10 +175,14 @@ while datetime.now() < end_time:
             url = txt_data['url']
         if 'path' in txt_data:
             path = txt_data['path']
+        if 'postapiurl' in txt_data:
+            postapiurl = txt_data['postapiurl']
 
         # url = 'http://192.168.4.70:8020/api/vehicle/getprevtransaction'
         #url = 'http://192.168.1.18:3333/api/vehicle/getprevtransaction'
+        print('jdnf')
         response = requests.get(url)
+        print(response.status_code)
         data = response.json()
         data['vehicleImage'] = ''
         data['numberPlateImage'] = ''
@@ -165,9 +205,17 @@ while datetime.now() < end_time:
         # Calculate the difference in hours
         time_difference = (current_time - dt1).total_seconds() / 3600
 
-        if time_difference > 22:
+        if time_difference > 18:
+            event_id =  1005
+            event_strings = """(Error) ANPR Service Attention Required  1005 """
+            description = f""" 
+------------------------------------------------------------------------------------
+VehicleNo:  {cardId}
+Transaction Date: {dateOfTransaction}
+------------------------------------------------------------------------------------
+Recommed you to verify LAN Connectivity,ANPR Camera power, contact your administrator """
 
-            application_error(f"Stored date is more than 24 hours old. last dated on {dateOfTransaction} for vehcle {cardId}")
+            event_viewer_log(event_id,event_strings,description)
             # windows_not('Anpr',f"Stored date is more than 24 hours old. last dated on {dateOfTransaction} for vehcle {cardId}")
 
             with open(path, 'a') as file:
@@ -176,6 +224,8 @@ while datetime.now() < end_time:
 
 
     except requests.exceptions.RequestException as e:
+        print('test')
+        event_viewer_log(1010, 'ANPR Services Stopped ', 'ANPR Services Stoppedslnfd ')
         with open(path, 'a') as file:
             file.write(f" {str(datetime.now())} : Error :  {e}    " + '\n' + '----------------------------------------------------------------------' + '\n')
 

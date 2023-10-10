@@ -1,2 +1,3 @@
 url = http://192.168.1.18:3333/api/vehicle/getprevtransaction
 path = C:\Users\saipa\Downloads\Anpr_testing_img\te_exe\latestgetprevtransaction_14-09-2023.txt
+postapiurl =
