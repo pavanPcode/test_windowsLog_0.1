@@ -119,7 +119,13 @@ def read_data_from_file():
 
     return data
 
-def requestpostdata(url):
+def requestpostdata(url,data):
+
+    item = GetPrevTransactionDetails(GetPrevTransactionDetailsquary)
+    item['dateOfTransaction'] = item['dateOfTransaction'].strftime("%Y-%m-%dT%H:%M:%S")
+    item['numberPlateImageb64'] = utilitys.convert_image_to_base64(item['numberPlateImage'])
+    item['vehicleImageb64'] = utilitys.convert_image_to_base64(item['vehicleImage'])
+
 
     form_data = {
         "gm_transaction_id": "12345",
