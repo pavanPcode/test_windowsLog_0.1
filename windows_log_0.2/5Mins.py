@@ -9,8 +9,7 @@ import base64
 #from post_Active_transactions import check_active_requests,db_update_record
 date = datetime.now()
 import win32evtlog
-import win32evtlogutil
-import win32con
+
 import mysql.connector
 import requests
 import base64
@@ -204,26 +203,30 @@ def event_viewer_log(event_id,event_strings,description):
 
 
 def starting_event_TEST():
+    try:
+        # Define your event source and log name
+        # event_source = "iParkRight"
+        event_log = "iParkRightAnpr"
 
-    # Define your event source and log name
-    #event_source = "iParkRight"
-    event_log = "iParkRightAnpr"
+        # Open the event log for writing
+        handle = win32evtlog.OpenEventLog(None, event_log)
 
-    # Open the event log for writing
-    handle = win32evtlog.OpenEventLog(None, event_log)
+        # Define the event category, event ID, and event message
+        event_category = 0
+        event_id = 5501  # Unique event ID
+        event_message = f"ANPR Services Started Successfully - {datetime.now()} "
 
-    # Define the event category, event ID, and event message
-    event_category = 0
-    event_id = 1001  # Unique event ID
-    event_message = f"ANPR Services Started Successfully - {datetime.now()} "
+        # Write an information event
+        win32evtlog.ReportEvent(handle, win32evtlog.EVENTLOG_INFORMATION_TYPE, event_category, event_id, None,
+                                (event_message,), None)
 
-    # Write an information event
-    win32evtlog.ReportEvent(handle, win32evtlog.EVENTLOG_INFORMATION_TYPE, event_category, event_id, None,
-                            (event_message,),None)
+        # Close the event log handle
+        win32evtlog.CloseEventLog(handle)
+        return False
+    except Exception as e:
+        return f"An error occurred: {e}"
 
-    # Close the event log handle
-    win32evtlog.CloseEventLog(handle)
-    return False
+
 
 
 
@@ -242,10 +245,10 @@ if 'delimgapiurl' in txt_data:
 if 'deldbrecordsapiurl' in txt_data:
     deldbrecordsapiurl = txt_data['deldbrecordsapiurl']
 
-count = 0
-while count == 0:
+try:
     start_event_log = starting_event_TEST()
-    count += 1
+except:
+    pass
 
 end_time = datetime.now() + timedelta(days=30)
 while datetime.now() < end_time:
@@ -253,10 +256,11 @@ while datetime.now() < end_time:
     try:
 
         try:
-            check_active_requests(postapiurl)
+            f = check_active_requests(postapiurl)
             response = requests.post(delimgapiurl)
             response = requests.post(deldbrecordsapiurl)
-            db_update_record("""UPDATE requestvehicle SET isActive  = 0 WHERE DATE(RefNoDatetIME) != CURDATE();""")
+            c = db_update_record("""UPDATE requestvehicle SET isActive  = 0 WHERE DATE(RefNoDatetIME) != CURDATE();""")
+            print(c)
         except:
             pass
 
@@ -281,7 +285,7 @@ while datetime.now() < end_time:
         time_difference = (current_time - dt1).total_seconds() / 3600
 
         if time_difference > 18:
-            event_id =  1005
+            event_id =  5505
             event_strings = """(Error) ANPR Service Attention Required  1005 """
             description = f""" 
 ------------------------------------------------------------------------------------
@@ -299,7 +303,7 @@ Recommed you to verify LAN Connectivity,ANPR Camera power, contact your administ
 
 
     except requests.exceptions.RequestException as e:
-        event_viewer_log(1010, 'ANPR Services Stopped ', 'ANPR Services Stoppedslnfd ')
+        event_viewer_log(5510, 'ANPR Services Stopped ', 'ANPR Services Stoppedslnfd ')
         with open(path, 'a') as file:
             file.write(f" {str(datetime.now())} : Error :  {e}    " + '\n' + '----------------------------------------------------------------------' + '\n')
 
