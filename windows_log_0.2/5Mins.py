@@ -84,7 +84,7 @@ def dbgetlasttransactions(sql_query):
 
 def call_post_api(url,data,refno):
     try:
-        print(url)
+        # print(url)
         result = {
         "gm_transaction_id": refno,
         "vehicle_numberplate_b64": data['numberPlateImageb64'],
@@ -128,17 +128,17 @@ sql_quary_get_vehcle_details = """SELECT vt.id id,vt.machineId machineId, vt.Dev
 vti.VehicleImage vehicleImage, vti.VehicleImage numberPlateImage,'' numberPlateImageb64,'' vehicleImageb64
 FROM VehicleTransaction vt
 INNER JOIN VehicleTransactionImage vti ON vt.id = vti.VehicleTransactionId
-WHERE dateOfTransaction BETWEEN  DATE_ADD('{0}', INTERVAL -180 SECOND)  AND  '{0}'
+WHERE dateOfTransaction BETWEEN DATE_SUB('{0}', INTERVAL {1} SECOND) and '{0}'
+order by DateOfTransaction  limit 1"""
 
-order by DateOfTransaction desc limit 1"""
-
-def check_active_requests(url):
+def check_active_requests(url,requestSendInSeconds):
     RequestVehicle = dbgetlasttransactions("select * from RequestVehicle where isActive = 1")
 
     if RequestVehicle != []:
         for i in RequestVehicle:
             refno = i['RefNo']
-            data = dbgetlasttransactions(sql_quary_get_vehcle_details.format(i['RefNoDatetime']))
+            #print(sql_quary_get_vehcle_details.format(i['RefNoDatetime'],requestSendInSeconds))
+            data = dbgetlasttransactions(sql_quary_get_vehcle_details.format(i['RefNoDatetime'],requestSendInSeconds))
             if data != []:
                 for veh_details in data:
                     veh_details['dateOfTransaction'] = veh_details['dateOfTransaction'].strftime("%Y-%m-%dT%H:%M:%S")
@@ -151,7 +151,7 @@ def check_active_requests(url):
 
                     if api_Responce == True:
 
-                        db_update_record(f"update RequestVehicle set isActive = 0 where id = {i['Id']}")
+                        db_update_record(f"update RequestVehicle set isActive = 0,RefStatus = 2,isActive0Time = CURRENT_TIMESTAMP,vehicletransactionId = {veh_details['id']},requestSendTime = CURRENT_TIMESTAMP where id = {i['Id']}")
 
     return 'suss'
 
@@ -244,6 +244,9 @@ if 'delimgapiurl' in txt_data:
     delimgapiurl = txt_data['delimgapiurl']
 if 'deldbrecordsapiurl' in txt_data:
     deldbrecordsapiurl = txt_data['deldbrecordsapiurl']
+if 'requestSendInSeconds' in txt_data:
+    requestSendInSeconds = txt_data['requestSendInSeconds']
+
 
 try:
     start_event_log = starting_event_TEST()
@@ -254,13 +257,12 @@ end_time = datetime.now() + timedelta(days=30)
 while datetime.now() < end_time:
 
     try:
-
         try:
-            f = check_active_requests(postapiurl)
+            f = check_active_requests(postapiurl,requestSendInSeconds)
             response = requests.post(delimgapiurl)
             response = requests.post(deldbrecordsapiurl)
-            c = db_update_record("""UPDATE requestvehicle SET isActive  = 0 WHERE DATE(RefNoDatetIME) != CURDATE();""")
-            print(c)
+            c = db_update_record("""UPDATE requestvehicle SET isActive  = 0 ,RefStatus = 3,isActive0Time = CURRENT_TIMESTAMP  WHERE DATE(RefNoDatetIME) != CURDATE() and RefStatus = 1 and isActive = 1 ;""")
+            # print(c)
         except:
             pass
 
