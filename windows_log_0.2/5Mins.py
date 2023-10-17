@@ -121,6 +121,7 @@ def convert_image_to_base64(image_path):
             return base64_encoded
     except Exception as e:
         print(f"Error converting image to base64: {str(e)}")
+
         return None
 
 
