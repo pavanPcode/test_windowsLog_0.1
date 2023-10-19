@@ -4,3 +4,4 @@ postapiurl = http://192.168.1.18:5001/uploadtest
 delimgapiurl = http://192.168.1.18:5001/api/vehicle/deleteAnprVehicleImage
 deldbrecordsapiurl = http://192.168.1.18:5001/api/vehicle/deleteAnprRecordsInDb
 requestSendInSeconds = 180
+requestSendInSecondsPlus = 120

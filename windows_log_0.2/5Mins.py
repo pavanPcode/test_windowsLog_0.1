@@ -125,21 +125,51 @@ def convert_image_to_base64(image_path):
         return None
 
 
-sql_quary_get_vehcle_details = """SELECT vt.id id,vt.machineId machineId, vt.DeviceId deviceId,vt.CardId cardId,vt.dateOfTransaction dateOfTransaction,
-vti.VehicleImage vehicleImage, vti.VehicleImage numberPlateImage,'' numberPlateImageb64,'' vehicleImageb64
+# sql_quary_get_vehcle_details = """SELECT vt.id id,vt.machineId machineId, vt.DeviceId deviceId,vt.CardId cardId,vt.dateOfTransaction dateOfTransaction,
+# vti.VehicleImage vehicleImage, vti.VehicleImage numberPlateImage,'' numberPlateImageb64,'' vehicleImageb64
+# FROM VehicleTransaction vt
+# INNER JOIN VehicleTransactionImage vti ON vt.id = vti.VehicleTransactionId
+# WHERE dateOfTransaction BETWEEN DATE_SUB('{0}', INTERVAL {1} SECOND) and '{0}'
+# order by DateOfTransaction  limit 1"""
+
+sql_quary_get_vehcle_details = """(SELECT vt.id AS id,
+       vt.machineId AS machineId,
+       vt.DeviceId AS deviceId,
+       vt.CardId AS cardId,
+       vt.dateOfTransaction AS dateOfTransaction,
+       vti.VehicleImage AS vehicleImage,
+       vti.VehicleImage AS numberPlateImage,
+       '' AS numberPlateImageb64,
+       '' AS vehicleImageb64
 FROM VehicleTransaction vt
 INNER JOIN VehicleTransactionImage vti ON vt.id = vti.VehicleTransactionId
-WHERE dateOfTransaction BETWEEN DATE_SUB('{0}', INTERVAL {1} SECOND) and '{0}'
-order by DateOfTransaction  limit 1"""
+WHERE vt.dateOfTransaction BETWEEN DATE_SUB('{0}', INTERVAL {1} SECOND) AND '{0}'
+ORDER BY dateOfTransaction desc limit 1)
+UNION all
+ (SELECT vt.id AS id,
+       vt.machineId AS machineId,
+       vt.DeviceId AS deviceId,
+       vt.CardId AS cardId,
+       vt.dateOfTransaction AS dateOfTransaction,
+       vti.VehicleImage AS vehicleImage,
+       vti.VehicleImage AS numberPlateImage,
+       '' AS numberPlateImageb64,
+       '' AS vehicleImageb64
+FROM VehicleTransaction vt
+INNER JOIN VehicleTransactionImage vti ON vt.id = vti.VehicleTransactionId
+WHERE vt.dateOfTransaction BETWEEN  '{0}'  AND date_add('{0}', INTERVAL {2} SECOND)
+ORDER BY dateOfTransaction limit 1) limit 1
+"""
 
-def check_active_requests(url,requestSendInSeconds):
+
+def check_active_requests(url,requestSendInSeconds,requestSendInSecondsPlus):
     RequestVehicle = dbgetlasttransactions("select * from RequestVehicle where isActive = 1")
 
     if RequestVehicle != []:
         for i in RequestVehicle:
             refno = i['RefNo']
-            #print(sql_quary_get_vehcle_details.format(i['RefNoDatetime'],requestSendInSeconds))
-            data = dbgetlasttransactions(sql_quary_get_vehcle_details.format(i['RefNoDatetime'],requestSendInSeconds))
+            #print(sql_quary_get_vehcle_details.format(i['RefNoDatetime'],requestSendInSeconds,requestSendInSecondsPlus))
+            data = dbgetlasttransactions(sql_quary_get_vehcle_details.format(i['RefNoDatetime'],requestSendInSeconds,requestSendInSecondsPlus))
             if data != []:
                 for veh_details in data:
                     veh_details['dateOfTransaction'] = veh_details['dateOfTransaction'].strftime("%Y-%m-%dT%H:%M:%S")
@@ -247,7 +277,8 @@ if 'deldbrecordsapiurl' in txt_data:
     deldbrecordsapiurl = txt_data['deldbrecordsapiurl']
 if 'requestSendInSeconds' in txt_data:
     requestSendInSeconds = txt_data['requestSendInSeconds']
-
+if 'requestSendInSecondsPlus' in txt_data:
+    requestSendInSecondsPlus = txt_data['requestSendInSecondsPlus']
 
 try:
     start_event_log = starting_event_TEST()
@@ -259,7 +290,7 @@ while datetime.now() < end_time:
 
     try:
         try:
-            f = check_active_requests(postapiurl,requestSendInSeconds)
+            f = check_active_requests(postapiurl,requestSendInSeconds,requestSendInSecondsPlus)
             response = requests.post(delimgapiurl)
             response = requests.post(deldbrecordsapiurl)
             c = db_update_record("""UPDATE requestvehicle SET isActive  = 0 ,RefStatus = 3,isActive0Time = CURRENT_TIMESTAMP  WHERE DATE(RefNoDatetIME) != CURDATE() and RefStatus = 1 and isActive = 1 ;""")
