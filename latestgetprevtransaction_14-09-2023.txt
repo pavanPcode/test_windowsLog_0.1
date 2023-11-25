@@ -1,0 +1,24 @@
+ 2023-10-09 11:21:24.515552 :  {'cardId': 'KL18X9570', 'dateOfTransaction': 'Mon, 09 Oct 2023 11:11:25 GMT', 'deviceId': 'ANPR-OUT', 'id': 120, 'machineId': 1, 'numberPlateImage': '', 'numberPlateImageb64': '', 'vehicleImage': '', 'vehicleImageb64': ''}    
+----------------------------------------------------------------------
+ 2023-10-09 11:22:04.268364 :  {'cardId': 'KL18X9570', 'dateOfTransaction': 'Mon, 09 Oct 2023 11:11:25 GMT', 'deviceId': 'ANPR-OUT', 'id': 120, 'machineId': 1, 'numberPlateImage': '', 'numberPlateImageb64': '', 'vehicleImage': '', 'vehicleImageb64': ''}    
+----------------------------------------------------------------------
+ 2023-10-09 11:23:49.177466 :  {'cardId': 'KL18X9570', 'dateOfTransaction': 'Mon, 09 Oct 2023 11:11:25 GMT', 'deviceId': 'ANPR-OUT', 'id': 120, 'machineId': 1, 'numberPlateImage': '', 'numberPlateImageb64': '', 'vehicleImage': '', 'vehicleImageb64': ''}    
+----------------------------------------------------------------------
+ 2023-10-09 11:24:04.725369 :  {'cardId': 'KL18X9570', 'dateOfTransaction': 'Mon, 09 Oct 2023 11:11:25 GMT', 'deviceId': 'ANPR-OUT', 'id': 120, 'machineId': 1, 'numberPlateImage': '', 'numberPlateImageb64': '', 'vehicleImage': '', 'vehicleImageb64': ''}    
+----------------------------------------------------------------------
+ 2023-10-09 11:32:29.961453 :  {'cardId': 'KL18X9570', 'dateOfTransaction': '2023-10-09T11:11:25', 'deviceId': 'ANPR-OUT', 'id': 120, 'machineId': 1, 'numberPlateImage': '', 'numberPlateImageb64': '', 'vehicleImage': '', 'vehicleImageb64': ''}    
+----------------------------------------------------------------------
+ 2023-10-09 11:32:52.593302 :  {'cardId': 'KL18X9570', 'dateOfTransaction': '2023-10-09T11:11:25', 'deviceId': 'ANPR-OUT', 'id': 120, 'machineId': 1, 'numberPlateImage': '', 'numberPlateImageb64': '', 'vehicleImage': '', 'vehicleImageb64': ''}    
+----------------------------------------------------------------------
+ 2023-10-09 11:37:54.645013 : Error :  HTTPConnectionPool(host='192.168.1.18', port=3333): Max retries exceeded with url: /api/vehicle/getprevtransaction (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x000001BA2FE6C3D0>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))    
+----------------------------------------------------------------------
+ 2023-10-09 11:42:56.693360 : Error :  HTTPConnectionPool(host='192.168.1.18', port=3333): Max retries exceeded with url: /api/vehicle/getprevtransaction (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x000001BA2FE6E5D0>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))    
+----------------------------------------------------------------------
+ 2023-10-09 11:47:58.740161 : Error :  HTTPConnectionPool(host='192.168.1.18', port=3333): Max retries exceeded with url: /api/vehicle/getprevtransaction (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x000001BA2FE78510>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))    
+----------------------------------------------------------------------
+ 2023-10-09 11:53:00.795314 : Error :  HTTPConnectionPool(host='192.168.1.18', port=3333): Max retries exceeded with url: /api/vehicle/getprevtransaction (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x000001BA2FE7A410>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))    
+----------------------------------------------------------------------
+ 2023-10-09 11:58:02.842597 : Error :  HTTPConnectionPool(host='192.168.1.18', port=3333): Max retries exceeded with url: /api/vehicle/getprevtransaction (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x000001BA2FE84350>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))    
+----------------------------------------------------------------------
+ 2023-10-09 12:08:03.791152 : Error :  HTTPConnectionPool(host='192.168.1.18', port=3333): Max retries exceeded with url: /api/vehicle/getprevtransaction (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x0000017506D22990>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))    
+----------------------------------------------------------------------

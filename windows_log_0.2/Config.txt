@@ -1,7 +1,7 @@
-get_url = http://192.168.1.18:5001/api/vehicle/getprevtransaction
+get_url = http://192.168.1.20:5001/api/vehicle/getprevtransaction
 get_url_file_path = C:\Users\saipa\Downloads\Anpr_testing_img\te_exe\latestgetprevtransaction_14-09-2023.txt
-postapiurl = http://192.168.1.18:5001/uploadtest
-delimgapiurl = http://192.168.1.18:5001/api/vehicle/deleteAnprVehicleImage
-deldbrecordsapiurl = http://192.168.1.18:5001/api/vehicle/deleteAnprRecordsInDb
+postapiurl = http://192.168.1.20:5001/uploadtest
+delimgapiurl = http://192.168.1.20:5001/api/vehicle/deleteAnprVehicleImage
+deldbrecordsapiurl = http://192.168.1.20:5001/api/vehicle/deleteAnprRecordsInDb
 requestSendInSeconds = 180
 requestSendInSecondsPlus = 120
